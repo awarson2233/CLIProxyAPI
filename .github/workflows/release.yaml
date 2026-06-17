@@ -382,9 +382,15 @@ jobs:
           - target: linux-amd64-no-plugin
             goarch: amd64
             asset_arch: amd64
+            goarm: ''
           - target: linux-arm64-no-plugin
             goarch: arm64
             asset_arch: aarch64
+            goarm: ''
+          - target: linux-armv7-no-plugin
+            goarch: arm
+            asset_arch: armv7
+            goarm: '7'
     steps:
       - uses: actions/checkout@v6
         with:
@@ -424,6 +430,7 @@ jobs:
           TARGET: ${{ matrix.target }}
           GOARCH: ${{ matrix.goarch }}
           ASSET_ARCH: ${{ matrix.asset_arch }}
+          GOARM: ${{ matrix.goarm }}
         run: |
           set -euo pipefail
 
@@ -432,7 +439,7 @@ jobs:
           rm -rf "dist/${TARGET}"
           mkdir -p "$archive_dir"
 
-          CGO_ENABLED=0 GOOS=linux GOARCH="$GOARCH" go build -buildvcs=false \
+          CGO_ENABLED=0 GOOS=linux GOARCH="$GOARCH" GOARM="$GOARM" go build -buildvcs=false \
             -ldflags="-s -w -X main.Version=${RELEASE_VERSION} -X main.Commit=${COMMIT} -X main.BuildDate=${BUILD_DATE}" \
             -o "$archive_dir/cli-proxy-api" ./cmd/server/
 
